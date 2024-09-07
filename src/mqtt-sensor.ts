@@ -1,4 +1,4 @@
-import { MqttClient } from "mqtt";
+import { Mqtt } from "./mqtt.js";
 
 interface MqttSensorConfig {
   uniqueId: string;
@@ -12,16 +12,9 @@ interface MqttSensorConfig {
 export class MqttSensor {
   private stateTopic: string;
 
-  constructor(private client: MqttClient, private config: MqttSensorConfig) {
+  constructor(private client: Mqtt, private config: MqttSensorConfig) {
     this.stateTopic = `${this.config.context}/${this.config.uniqueId}/sensor/${this.config.deviceClass}`;
     this.initialise();
-  }
-
-  private publish(topic: string, data: Record<string, unknown> | string) {
-    const dataString =
-      typeof data !== "string" ? JSON.stringify(data, null, 2) : data;
-    console.log(`${topic} -> ${dataString}`);
-    this.client.publish(topic, dataString);
   }
 
   public get uniqueId() {
@@ -33,15 +26,8 @@ export class MqttSensor {
 
     this.triggerDiscovery();
 
-    this.client.subscribe(homeAssistantStatusTopic, () => {
-      console.log(`Subscribed to ${homeAssistantStatusTopic}`);
-    });
-
-    this.client.on("message", (topic, message) => {
-      if (
-        topic === homeAssistantStatusTopic &&
-        message.toString() === "online"
-      ) {
+    this.client.subscribe(homeAssistantStatusTopic, (message) => {
+      if (message === "online") {
         this.triggerDiscovery();
       }
     });
@@ -62,10 +48,10 @@ export class MqttSensor {
       friendly_name: this.config.friendlyName,
     };
 
-    this.publish(topic, discoveryConfig);
+    this.client.publish(topic, discoveryConfig);
   }
 
   public setState(state: string | number) {
-    this.publish(this.stateTopic, String(state));
+    this.client.publish(this.stateTopic, String(state));
   }
 }

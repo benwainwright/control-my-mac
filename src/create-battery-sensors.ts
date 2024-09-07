@@ -1,12 +1,9 @@
-import { MqttClient } from "mqtt";
 import { generateUniqueId } from "./generate-unique-id.js";
 import { getItemsWithBatteryFromIoreg } from "./get-items-with-battery-from-ioreg.js";
 import { MqttSensor } from "./mqtt-sensor.js";
+import { Mqtt } from "./mqtt.js";
 
-export const createBatterySensors = (
-  client: MqttClient,
-  pushInterval: number
-) => {
+export const createBatterySensors = (client: Mqtt, pushInterval: number) => {
   const sensors: MqttSensor[] = [];
 
   setInterval(async () => {
