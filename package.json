@@ -5,9 +5,13 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node node_modules/.bin/vite-node src/run.ts"
+    "start": "vite-node src/run.ts",
+    "gen:launch-daemon": "vite-node src/generate-launch-daemon-plist.ts > com.benwainwright.control-mac.plist",
+    "launchctl:load": "sudo launchctl load /Library/LaunchDaemons/com.benwainwright.control-mac.plist",
+    "launchctl:unload": "sudo launchctl unload /Library/LaunchDaemons/com.benwainwright.control-mac.plist",
+    "build": "tsc"
   },
-  "author": "",
+  "author": "Ben Wainwright",
   "license": "ISC",
   "dependencies": {
     "@types/node": "^22.5.4",

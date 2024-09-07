@@ -1,1 +1,4 @@
 node_modules
+ecosystem.config.js
+dist
+com.benwainwright.control-mac.plist

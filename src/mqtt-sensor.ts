@@ -1,4 +1,4 @@
-import { MqttClient } from "mqtt/*";
+import { MqttClient } from "mqtt";
 
 interface MqttSensorConfig {
   uniqueId: string;
@@ -11,6 +11,7 @@ interface MqttSensorConfig {
 
 export class MqttSensor {
   private stateTopic: string;
+
   constructor(private client: MqttClient, private config: MqttSensorConfig) {
     this.stateTopic = `${this.config.context}/${this.config.uniqueId}/sensor/${this.config.deviceClass}`;
     this.initialise();
