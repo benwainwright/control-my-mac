@@ -25,7 +25,7 @@ export const createBatterySensors = (client: Mqtt, pushInterval: number) => {
         );
         return;
       }
-      existing.setState(String(device.BatteryPercent));
+      existing.state = String(device.BatteryPercent);
     });
   }, pushInterval);
 };

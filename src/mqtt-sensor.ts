@@ -11,6 +11,7 @@ interface MqttSensorConfig {
 
 export class MqttSensor {
   private stateTopic: string;
+  private _state: string | undefined;
 
   constructor(private client: Mqtt, private config: MqttSensorConfig) {
     this.stateTopic = `${this.config.context}/${this.config.uniqueId}/sensor/${this.config.deviceClass}`;
@@ -51,7 +52,14 @@ export class MqttSensor {
     this.client.publish(topic, discoveryConfig);
   }
 
-  public setState(state: string | number) {
-    this.client.publish(this.stateTopic, String(state));
+  public get state(): string {
+    return this._state ?? "";
+  }
+
+  public set state(state: string) {
+    if (state !== this._state) {
+      this._state = state;
+      this.client.publish(this.stateTopic, state);
+    }
   }
 }
