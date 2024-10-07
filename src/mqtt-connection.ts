@@ -1,6 +1,6 @@
 import mqtt, { IClientOptions, MqttClient } from "mqtt";
 
-export class Mqtt {
+export class MqttConnection {
   private _client: MqttClient | undefined;
 
   public constructor(private options: IClientOptions) {}

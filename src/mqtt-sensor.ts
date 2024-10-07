@@ -1,4 +1,4 @@
-import { Mqtt } from "./mqtt.js";
+import { MqttConnection } from "./mqtt-connection.js";
 
 interface MqttSensorConfig {
   uniqueId: string;
@@ -13,7 +13,10 @@ export class MqttSensor {
   private stateTopic: string;
   private _state: string | undefined;
 
-  constructor(private client: Mqtt, private config: MqttSensorConfig) {
+  constructor(
+    private client: MqttConnection,
+    private config: MqttSensorConfig
+  ) {
     this.stateTopic = `${this.config.context}/${this.config.uniqueId}/sensor/${this.config.deviceClass}`;
     this.initialise();
   }
@@ -23,11 +26,11 @@ export class MqttSensor {
   }
 
   private initialise() {
-    const homeAssistantStatusTopic = "homeassistant/status";
+    const homeassistantstatustopic = "homeassistant/status";
 
     this.triggerDiscovery();
 
-    this.client.subscribe(homeAssistantStatusTopic, (message) => {
+    this.client.subscribe(homeassistantstatustopic, (message) => {
       if (message === "online") {
         this.triggerDiscovery();
       }
