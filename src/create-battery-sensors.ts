@@ -1,7 +1,7 @@
 import { generateUniqueId } from "./generate-unique-id.js";
-import { getItemsWithBatteryFromIoreg } from "./get-items-with-battery-from-ioreg.js";
 import { MqttSensor } from "./mqtt-sensor.js";
 import { MqttConnection } from "./mqtt-connection.js";
+import { System } from "./types/system.js";
 
 const defaultBatterySensorConfig = {
   deviceClass: "battery",
@@ -12,18 +12,23 @@ const defaultBatterySensorConfig = {
 
 export const createBatterySensors = (
   client: MqttConnection,
+  system: System,
   pushInterval: number
 ) => {
   const sensors: MqttSensor[] = [];
 
   setInterval(async () => {
-    const response = await getItemsWithBatteryFromIoreg();
-    response.forEach((device) => {
-      const uniqueId = generateUniqueId(
-        `${device.Product}_${device.DeviceAddress}`
-      );
+    const batteryLevels = await system.getBluetoothDevicesBatteryLevels().catch(
+      (error: unknown) => {
+        console.error("Failed to read Bluetooth battery levels", error);
+        return [];
+      }
+    );
 
-      const friendlyName = `${device.Product} battery`;
+    batteryLevels.forEach((device) => {
+      const uniqueId = generateUniqueId(
+        device.deviceId
+      );
 
       const existing = sensors.find((sensor) => sensor.uniqueId === uniqueId);
       if (!existing) {
@@ -31,12 +36,12 @@ export const createBatterySensors = (
           new MqttSensor(client, {
             ...defaultBatterySensorConfig,
             uniqueId,
-            friendlyName,
+            friendlyName: device.deviceName,
           })
         );
         return;
       }
-      existing.state = String(device.BatteryPercent);
+      existing.state = String(device.percent);
     });
   }, pushInterval);
 };

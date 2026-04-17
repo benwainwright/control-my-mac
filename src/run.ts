@@ -1,8 +1,8 @@
 import { createBatterySensors } from "./create-battery-sensors.js";
-import { listenForScreenOffMessage } from "./listen-for-screen-off-message.js";
-import { listenForShutdownMessage } from "./listen-for-shutdown-message.js";
+import { getSystem } from "./get-system.js";
 import { MqttConnection } from "./mqtt-connection.js";
 
+const namespace = process.env["HASS_INSTANCE_NAMESPACE"];
 const username = process.env["HASS_USERNAME"];
 const password = process.env["HASS_PASSWORD"];
 const host = "homeassistant.local";
@@ -19,6 +19,14 @@ const client = new MqttConnection({
 
 await client.connect();
 
-createBatterySensors(client, updateInterval);
-listenForShutdownMessage(client, "bens_imac/commands/shutdown");
-listenForScreenOffMessage(client, "bens_imac/commands/screen_off");
+const system = getSystem();
+
+createBatterySensors(client, system, updateInterval);
+
+client.subscribe(`${namespace}/commands/shutdown`, async () => {
+  await system.shutdown();
+});
+
+client.subscribe(`${namespace}/commands/screen_off`, async () => {
+  await system.turnoffScreen();
+});

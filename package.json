@@ -7,9 +7,11 @@
   "scripts": {
     "start": "vite-node src/run.ts",
     "gen:launch-daemon": "vite-node src/generate-launch-daemon-plist.ts > com.benwainwright.control-mac.plist",
+    "copy:daemon": "sudo cp com.benwainwright.control-mac.plist /Library/LaunchDaemons",
     "launchctl:load": "sudo launchctl load /Library/LaunchDaemons/com.benwainwright.control-mac.plist",
     "launchctl:unload": "sudo launchctl unload /Library/LaunchDaemons/com.benwainwright.control-mac.plist",
-    "build": "tsc"
+    "build": "tsc",
+    "install:daemon": "npm run build && npm run gen:launch-daemon && npm run copy:daemon && npm run launchctl:load"
   },
   "author": "Ben Wainwright",
   "license": "ISC",
@@ -21,6 +23,7 @@
     "mqtt": "^5.10.1",
     "plist": "^3.1.0",
     "typescript": "^5.5.4",
-    "vite-node": "^2.0.5"
+    "vite-node": "^2.0.5",
+    "vitest": "^2.1.8"
   }
 }

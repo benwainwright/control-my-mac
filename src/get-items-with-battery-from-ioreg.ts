@@ -1,5 +1,6 @@
 import { execa } from "execa";
-import plist from "plist";
+
+import { parseIoregBatteryPlist } from "./parse-ioreg-battery-plist.js";
 
 export const getItemsWithBatteryFromIoreg = async () => {
   const result = await execa("ioreg", [
@@ -9,8 +10,5 @@ export const getItemsWithBatteryFromIoreg = async () => {
     "-k",
     "BatteryPercent",
   ]);
-  return plist.parse(result.stdout) as Record<
-    string,
-    string | number | boolean | Buffer
-  >[];
+  return parseIoregBatteryPlist(result.stdout);
 };
